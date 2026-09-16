@@ -1,5 +1,5 @@
 ---
-name: PR Butler
+name: pr-butler
 description: Automate comprehensive pre-commit / PR preparation — translations, code cleanup, tests, documentation, and quality gates.
 ---
 
@@ -25,27 +25,44 @@ The PR Butler automates the complete pre-commit checklist for web projects, ensu
 
 ### Step 1: Translation Detection & Fix
 
-<!-- Describe how to detect missing French translations and generate them -->
+- Compare keys in src/translations/en.json vs src/translations/fr.json
+- Generate missing French translations using context from the English values
+- Update fr.json — validate all 14 keys are present
 
 ### Step 2: Code Cleanup
 
-<!-- Describe how to format code and fix lint violations -->
+- Format all source files consistently (Prettier or equivalent)
+- Fix auto-fixable lint violations
+- Fix the handleSubmit function formatting in main.ts
 
 ### Step 3: Test Automation
 
-<!-- Describe how to run tests, generate missing test cases, achieve >80% coverage -->
+- Run existing tests: npm run test
+- Generate test cases for: toggleTask, deleteTask, setFilter, render, saveToStorage, loadFromStorage
+- Re-run to confirm all pass
+- Achieve >80% coverage: npm run test:coverage
 
 ### Step 4: Documentation Updates
 
-<!-- Describe how to add docstrings, update README.md, generate CHANGELOG.md and PR_REQUEST.md -->
+| Document | What to Do |
+|----------|-----------|
+| **Source docstrings** | JSDoc/TSDoc on all 9 undocumented public functions in `src/` |
+| **`scaffold/website/README.md`** | Add Features, Testing, and Contributing sections |
+| **`CHANGELOG.md`** | Summarize all fixes made by the Skill |
+| **`PR_REQUEST.md`** | Conventional PR description with title, summary, checklist, coverage report |
 
 ### Step 5: Quality Gates
 
-<!-- Describe the quality gates to enforce before proceeding -->
+- Coverage ≥ 80% — fail if below
+- Zero critical lint errors
+- All tests pass
+- If any gate fails: report the failure and stop
 
 ### Step 6: PR Preparation
 
-<!-- Describe how to generate the conventional commit message and finalize deliverables -->
+- Generate a conventional commit message from the changes
+- Finalize `PR_REQUEST.md` with all quality metrics
+- Confirm all Step 4 deliverables are complete
 
 ---
 
@@ -62,19 +79,14 @@ The PR Butler automates the complete pre-commit checklist for web projects, ensu
 
 **Expected output:**
 
-```
-<!-- Fill in the expected step-by-step output -->
-```
+OVERALL: 6 / 6 steps passed
+GRADE: A
 
 ### Example 2: Translation-Only Run
 
 **Input:** "Fix the missing French translations"
 
-**Expected output:**
-
-```
-<!-- Fill in the expected output -->
-```
+**Expected output:** "Added the 12 missing French translations in fr.json. All 14 keys are now present."
 
 ---
 

@@ -1,28 +1,39 @@
 import { TaskManager } from './taskManager'
-import { loadTranslations, setLanguage } from './i18n'
+import { loadTranslations, setLanguage, t } from './i18n'
 import { TaskFilter } from './types'
 import './styles.css'
 
-// Deliberately poor code quality for PR Butler to fix
 let taskManager: TaskManager
 
-// Initialize app
-async function init() {
+/** Loads translations, creates the task manager, and initializes the UI. */
+export async function init() {
   await loadTranslations()
   taskManager = new TaskManager()
   setupEventListeners()
+  applyTranslations()
   taskManager.render()
 }
 
-function setupEventListeners() {
+function applyTranslations() {
+  document.querySelectorAll<HTMLElement>('[data-i18n]').forEach(element => {
+    const key = element.dataset.i18n
+    if (key) element.textContent = t(key)
+  })
+
+  document.querySelectorAll<HTMLInputElement>('[data-i18n-placeholder]').forEach(element => {
+    const key = element.dataset.i18nPlaceholder
+    if (key) element.placeholder = t(key)
+  })
+}
+
+/** Registers form, language, and filter control event handlers. */
+export function setupEventListeners() {
   const form = document.getElementById('task-form') as HTMLFormElement
   const langEnBtn = document.getElementById('lang-en')
   const langFrBtn = document.getElementById('lang-fr')
-  
   form?.addEventListener('submit', handleSubmit)
   langEnBtn?.addEventListener('click', () => switchLanguage('en'))
   langFrBtn?.addEventListener('click', () => switchLanguage('fr'))
-  
   const filterBtns = document.querySelectorAll('.filter-btn')
   filterBtns.forEach(btn => {
     btn.addEventListener('click', (e) => {
@@ -37,29 +48,31 @@ function setupEventListeners() {
   })
 }
 
-// Poor formatting and style
-function handleSubmit(e: Event){
-e.preventDefault()
-const input=document.getElementById('task-input') as HTMLInputElement
-const select=document.getElementById('priority-select') as HTMLSelectElement
-if(input.value.trim()){
-taskManager.addTask(input.value,select.value as 'low'|'medium'|'high')
-input.value=''
-}
+/** Validates the form and adds the submitted task. */
+export function handleSubmit(event: Event) {
+  event.preventDefault()
+
+  const input = document.getElementById('task-input') as HTMLInputElement
+  const select = document.getElementById('priority-select') as HTMLSelectElement
+
+  if (input.value.trim()) {
+    taskManager.addTask(input.value.trim(), select.value as 'low' | 'medium' | 'high')
+    input.value = ''
+  }
 }
 
-function switchLanguage(lang: string) {
+/** Updates the active language control and selected language. */
+export function switchLanguage(lang: string) {
   setLanguage(lang)
-  
+  applyTranslations()
+
   document.querySelectorAll('.language-selector button').forEach(btn => {
     btn.classList.remove('active')
   })
   
   const activeBtn = document.getElementById(`lang-${lang}`)
   activeBtn?.classList.add('active')
-  
-  // Note: Translation application is missing - deliberate issue
+  taskManager?.render()
 }
 
-// Missing error handling
 init()

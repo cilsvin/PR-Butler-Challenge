@@ -23,24 +23,34 @@ The PR Butler automates the complete pre-commit checklist for web projects, ensu
   and what output to produce. Be specific — vague instructions produce vague results.
 -->
 
+- Before running project commands, change to `scaffold/website`, the directory containing `package.json`.
+- Preserve user changes and do not modify the locked Report Card section below.
+
 ### Step 1: Translation Detection & Fix
 
 - Compare keys in src/translations/en.json vs src/translations/fr.json
 - Generate missing French translations using context from the English values
 - Update fr.json — validate all 14 keys are present
+- Verify that the language toggle applies translations to all visible static and dynamic UI elements
+- Mark translatable elements with `data-i18n` or an equivalent key-based mechanism, including placeholders and select options
+- Rerender existing task labels and controls when switching languages
+- Add a regression test confirming that clicking the French toggle changes visible text from English to French
+- Verify the rendered page or DOM after clicking the French toggle. Check headings, buttons, placeholders, select options, filters, statistics, footer text, and existing task controls.
 
 ### Step 2: Code Cleanup
 
 - Format all source files consistently (Prettier or equivalent)
 - Fix auto-fixable lint violations
 - Fix the handleSubmit function formatting in main.ts
+- Inspect `package.json` for an available lint script before running lint. If no lint script exists, use the available formatter and TypeScript build checks, and report lint as not configured rather than claiming it passed.
+- Ensure initialization and language switching do not register duplicate event listeners or duplicate task renders.
 
 ### Step 3: Test Automation
 
 - Run existing tests: npm run test
 - Generate test cases for: toggleTask, deleteTask, setFilter, render, saveToStorage, loadFromStorage
 - Re-run to confirm all pass
-- Achieve >80% coverage: npm run test:coverage
+- Run `npm run test:coverage`, parse the reported coverage, and fail this step if statement, branch, function, or line coverage is below 80%.
 
 ### Step 4: Documentation Updates
 
@@ -48,14 +58,15 @@ The PR Butler automates the complete pre-commit checklist for web projects, ensu
 |----------|-----------|
 | **Source docstrings** | JSDoc/TSDoc on all 9 undocumented public functions in `src/` |
 | **`scaffold/website/README.md`** | Add Features, Testing, and Contributing sections |
-| **`CHANGELOG.md`** | Summarize all fixes made by the Skill |
-| **`PR_REQUEST.md`** | Conventional PR description with title, summary, checklist, coverage report |
+| **`scaffold/website/CHANGELOG.md`** | Summarize all fixes made by the Skill |
+| **`scaffold/website/PR_REQUEST.md`** | Conventional PR description with title, summary, checklist, coverage report |
 
 ### Step 5: Quality Gates
 
 - Coverage ≥ 80% — fail if below
 - Zero critical lint errors
 - All tests pass
+- Run `npm run build` and fail if TypeScript compilation or the Vite production build fails.
 - If any gate fails: report the failure and stop
 
 ### Step 6: PR Preparation
@@ -63,6 +74,7 @@ The PR Butler automates the complete pre-commit checklist for web projects, ensu
 - Generate a conventional commit message from the changes
 - Finalize `PR_REQUEST.md` with all quality metrics
 - Confirm all Step 4 deliverables are complete
+- Include the actual test, coverage, build, and lint results in `PR_REQUEST.md`.
 
 ---
 
@@ -102,6 +114,8 @@ GRADE: A
 - [ ] No lint violations
 - [ ] Test coverage ≥ 80%
 - [ ] All tests pass
+- [ ] `npm run build` passes
+- [ ] Language toggle visibly updates static and dynamic UI text
 - [ ] JSDoc/TSDoc on all public functions
 - [ ] `README.md` has Features, Testing, and Contributing sections
 - [ ] `CHANGELOG.md` generated
